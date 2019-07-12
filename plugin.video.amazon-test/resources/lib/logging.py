@@ -31,6 +31,23 @@ def WriteLog(data, fn=''):
     logfile.close()
 
 
+def LogJSON(o, url):
+    from os.path import join as OSPJoin
+    from json import dump
+
+    if not o:
+        return
+    from codecs import open as co
+    from datetime import datetime
+    try:
+        LogJSON.counter += 1
+    except:
+        LogJSON.counter = 0
+    with co(OSPJoin(g.DATA_PATH, '{}_{}.json'.format(datetime.now().strftime('%Y%m%d_%H%M%S%f'), LogJSON.counter)), 'w+', 'utf-8') as f:
+        f.write('/* %s */\n' % url)
+        dump(o, f, sort_keys=True, indent=4)
+
+
 Log.DEBUG = xbmc.LOGDEBUG
 Log.ERROR = xbmc.LOGERROR
 # Log.FATAL = xbmc.LOGFATAL
