@@ -404,6 +404,7 @@ class PrimeVideo(Singleton):
             metaKeys.extend(self._videodata[nodeName]['siblings'])
         metaKeys.append(nodeName)
         nodeKeys = [k for k in node if k not in metaKeys]
+        episodeExtraNum = 100
         i = 0
         while i < len(nodeKeys):
             key = nodeKeys[i]
@@ -501,6 +502,9 @@ class PrimeVideo(Singleton):
                     if 'episode' == m['videometa']['mediatype']:
                         if 'season' not in m['videometa']:
                             m['videometa']['season'] = self._videodata[nodeName]['metadata']['videometa']['season']
+                        if 'episode' not in m['videometa']:
+                            m['videometa']['episode'] = episodeExtraNum
+                            episodeExtraNum += 1
 
                     # https://codedocs.xyz/xbmc/xbmc/group__python__xbmcgui__listitem.html#ga0b71166869bda87ad744942888fb5f14
                     item.setInfo('video', m['videometa'])
