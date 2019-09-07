@@ -710,9 +710,9 @@ class PrimeVideo(Singleton):
             # Seasons
             if 'self' in state:
                 # "self": {"amzn1.dv.gti.[…]": {"gti": "amzn1.dv.gti.[…]", "link": "/detail/[…]"}}
-                for gti in state['self']:
-                    s = state['self'][gti]
-                    gti = s['gti']
+                for gti, s in state['self'].items():
+                    if s['titleType'] != 'season':
+                        continue
                     if gti not in self._videodata:
                         o[gti] = {('ref' if state['pageTitleId'] == gti else 'lazyLoadURL'): s['link']}
                         self._videodata[gti] = {'ref': s['link'], 'children': [], 'siblings': []}
