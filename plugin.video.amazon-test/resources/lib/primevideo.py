@@ -720,7 +720,7 @@ class PrimeVideo(Singleton):
                     else:
                         o[gti] = self._videodata[gti]
                     GTIs.append(gti)
-                    siblings = [k for k in state['self'] if k != gti]
+                    siblings = [k for k,ss in state['self'].items() if k != gti and ss['titleType'] == s['titleType']]
                     if siblings != self._videodata[gti]['siblings']:
                         self._videodata[gti]['siblings'] = siblings
                         bUpdated = True
