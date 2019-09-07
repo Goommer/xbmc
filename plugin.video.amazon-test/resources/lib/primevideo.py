@@ -399,6 +399,10 @@ class PrimeVideo(Singleton):
 
         folderType = 0 if 'root' == path else 1
         metaKeys = ['metadata', 'ref', 'title', 'verb', 'children', 'parent']
+        # Exclude me and my sibilings
+        if (nodeName in self._videodata) and ('siblings' in self._videodata[nodeName]) and (0<len(self._videodata[nodeName]['siblings'])):
+            metaKeys.extend(self._videodata[nodeName]['siblings'])
+        metaKeys.append(nodeName)
         nodeKeys = [k for k in node if k not in metaKeys]
         i = 0
         while i < len(nodeKeys):
