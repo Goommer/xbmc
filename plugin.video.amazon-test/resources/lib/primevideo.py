@@ -497,6 +497,11 @@ class PrimeVideo(Singleton):
                 if 'artmeta' in m:
                     item.setArt(m['artmeta'])
                 if 'videometa' in m:
+                    # episode must contain season number and episode number
+                    if 'episode' == m['videometa']['mediatype']:
+                        if 'season' not in m['videometa']:
+                            m['videometa']['season'] = self._videodata[nodeName]['metadata']['videometa']['season']
+
                     # https://codedocs.xyz/xbmc/xbmc/group__python__xbmcgui__listitem.html#ga0b71166869bda87ad744942888fb5f14
                     item.setInfo('video', m['videometa'])
                     try:
