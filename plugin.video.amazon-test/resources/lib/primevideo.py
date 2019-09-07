@@ -746,8 +746,7 @@ class PrimeVideo(Singleton):
             if urn not in self._videodata['urn2gti']:
                 self._videodata['urn2gti'][urn] = state['pageTitleId']
 
-            for gti in state['detail']:
-                item = state['detail'][gti]
+            for gti, item in state['detail']['detail'].items():
                 if gti not in GTIs:  # Most likely (surely?) movie
                     GTIs.append(gti)
                     o[gti] = {}
