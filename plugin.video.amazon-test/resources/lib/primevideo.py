@@ -777,7 +777,8 @@ class PrimeVideo(Singleton):
                         bUpdated = True
                     else:
                         try:
-                            vd['title'] = state['strings']['AVOD_DP_season_selector'].format(seasonNumber=item['seasonNumber'])
+                            #vd['title'] = state['strings']['AVOD_DP_season_selector'].format(seasonNumber=item['seasonNumber'])
+                            vd['title'] = self._BeautifyText(item['title'])
                             bUpdated = True
                         except:
                             vd['title'] = 'Season {}'.format(item['seasonNumber'])
