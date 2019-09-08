@@ -532,7 +532,7 @@ class PrimeVideo(Singleton):
             xbmcplugin.SORT_METHOD_NONE,
             xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE,
             xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE,
-            xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE,
+            xbmcplugin.SORT_METHOD_EPISODE,
             xbmcplugin.SORT_METHOD_EPISODE,
             xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE,
         ][folderType if None is forceSort else forceSort])
