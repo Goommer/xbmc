@@ -540,9 +540,9 @@ class PrimeVideo(Singleton):
         if 'false' == self._g.addon.getSetting("viewenable"):
             # Only vfs and videos to keep Kodi's watched functionalities
             folderType = 0 if 2 > folderType else 1
-        else:
-            # Actual views, set the main categories as vfs
-            folderType = 0 if 2 > folderType else 2
+        # else:
+        #     # Actual views, set the main categories as vfs
+        #     folderType = 0 if 2 > folderType else 2
 
         setContentAndView([None, 'videos', 'series', 'season', 'episode', 'movie'][folderType])
 
