@@ -961,7 +961,8 @@ class PrimeVideo(Singleton):
                                         'thumb': item['imageSrc']
                                     },
                                     'videometa': {
-                                        'mediatype': 'season'
+                                        'mediatype': 'season',
+                                        'plot': item['synopsis']
                                     }
                                 }
                             }
