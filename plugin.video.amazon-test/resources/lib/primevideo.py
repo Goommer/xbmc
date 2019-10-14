@@ -402,7 +402,12 @@ class PrimeVideo(Singleton):
         # Exclude me and my sibilings
         if (nodeName in self._videodata) and ('siblings' in self._videodata[nodeName]) and (0<len(self._videodata[nodeName]['siblings'])):
             metaKeys.extend(self._videodata[nodeName]['siblings'])
-        metaKeys.append(nodeName)
+        # some tickets have a child with the same name as the father
+        if 'ref' in node:
+            if not node['ref'].startswith('/storefront'):
+                metaKeys.append(nodeName)
+        else:
+            metaKeys.append(nodeName)
         nodeKeys = [k for k in node if k not in metaKeys]
         episodeExtraNum = 100
         i = 0
@@ -652,7 +657,11 @@ class PrimeVideo(Singleton):
                     Log('Unable to parse date "{}" with language "{}": format changed?'.format(datestr, lang), Log.WARNING)
                     return datestr
             p = list(p.groups())
-            p[self._dateParserData[lang]['month']] = self._dateParserData[lang]['months'][p[self._dateParserData[lang]['month']]]
+            # TODO: format es: "sep 20, 2019 21:00 CEST"
+            try:
+                p[self._dateParserData[lang]['month']] = self._dateParserData[lang]['months'][p[self._dateParserData[lang]['month']]]
+            except:
+                pass
             return self._dateParserData[lang]['reassemble'].format(p[0], p[1], p[2])
 
         def NotifyUser(msg):
@@ -725,6 +734,9 @@ class PrimeVideo(Singleton):
                 if not url:
                     return False
                 data = self._GrabJSON(url)
+            # Maybe Error reason: 404 error
+            if not data:
+                return False
 
             # Video/season/movie data are in the `state` field of the response
             if 'state' not in data:
@@ -752,6 +764,15 @@ class PrimeVideo(Singleton):
                     if siblings != self._videodata[gti]['siblings']:
                         self._videodata[gti]['siblings'] = siblings
                         bUpdated = True
+            # live streaming storefront
+            elif 'pageTitleId' in state:
+                gti = state['pageTitleId']
+                if gti not in self._videodata:
+                    o[gti] = {'ref': o['ref']}
+                    self._videodata[gti] = {'ref': o['ref'], 'children': [], 'siblings': []}
+                else:
+                    o[gti] = self._videodata[gti]
+                GTIs.append(gti)
 
             # Episodes lists
             if 'collections' in state:
@@ -824,6 +845,15 @@ class PrimeVideo(Singleton):
                     if (bCacheRefresh or (k not in vd['metadata']['videometa'])) and (v in item):
                         vd['metadata']['videometa'][k] = item[v]
                         bUpdated = True
+
+                # check mediatype for events:
+                if 'mediatype' in vd['metadata']['videometa']:
+                    mt = vd['metadata']['videometa']['mediatype']
+                    if 'EVENT' in mt:
+                        if 'children' in vd and 0 < len(vd['children']):
+                            vd['metadata']['videometa']['mediatype'] = 'season'
+                        else:
+                            vd['metadata']['videometa']['mediatype'] = 'movie'
 
                 # Genres
                 if (bCacheRefresh or ('genre' not in vd['metadata']['videometa'])) and ('genres' in item) and item['genres']:
@@ -990,9 +1020,27 @@ class PrimeVideo(Singleton):
                                     }
                                 }
                             }
+                    # movie
+                    elif 'titleID' in item:
+                        bUpdatedVideoData |= ParseSinglePage(o, bCacheRefresh, url=item['link']['url'])
                     # Watchlist
                     else:
                         Log('Show all seasons in watchlist: {}'.format(self._s.dispShowOnly))
+                        title = item['title']
+                        iu = item['link']['url']
+                        o[title] = {
+                            'title': self._BeautifyText(title),
+                            'lazyLoadURL': iu,
+                            'metadata': {
+                                'artmeta': {
+                                    'thumb': item['image']['url']
+                                },
+                                'videometa': {
+                                    'mediatype': 'season',
+                                }
+                            }
+                        }
+
 
             # Search/list
             if ('results' in cnt) and ('items' in cnt['results']):
