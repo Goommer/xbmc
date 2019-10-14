@@ -990,9 +990,13 @@ class PrimeVideo(Singleton):
             # Watchlist
             if 'filters' in cnt:
                 for f in cnt['filters']:
-                    o[f['id']] = {'title': f['text'], 'lazyLoadURL': f['apiUrl' if 'apiUrl' in f else 'href']}
-                    if 'applied' in cnt['filters'][0]:
-                        o[f['id']]['lazyLoadData'] = cnt['content']
+                    # if it is not applied in all filters it indicates that it is the initial
+                    if 'applied' not in cnt['filters'][len(cnt['filters'])-1]:
+                        o[f['id']] = {'title': f['text'], 'lazyLoadURL': f['apiUrl' if 'apiUrl' in f else 'href']}
+            if 'content' in cnt and 'items' in cnt['content'] and '*className*' in cnt['content']:
+                for item in cnt['content']['items']:
+                    o[item['titleID']] = {}
+                    bUpdatedVideoData |= ParseSinglePage(o[item['titleID']], bCacheRefresh, url=item['href'])
 
             # Single page
             if 'state' in cnt:
