@@ -580,9 +580,10 @@ class PrimeVideo(Singleton):
         if None is node:
             return
 
+        nodeName = breadcrumb[-1]
         # Only refresh if previously loaded. If not loaded, and specifically asked, perform a full (lazy) loading
         if 'lazyLoadURL' in node[nodeName]:
-            refreshes.append((node[nodeName], nodeName, False, None))
+            refreshes.append((node[nodeName], nodeName, False))
         else:
             bShow = False
             if 'ref' in node[nodeName]:  # ref's in the cache already
@@ -596,7 +597,7 @@ class PrimeVideo(Singleton):
                 bShow = True
                 for season in [k for k in self._videodata[nodeName]['children'] if (k in self._videodata) and ('ref' in self._videodata[k])]:
                     node[nodeName][season] = {'lazyLoadURL': self._videodata[season]['ref']}
-                    refreshes.append((node[nodeName][season], season, None, None, True))
+                    refreshes.append((node[nodeName][season], season, True))
 
             if not bShow:
                 # Reset the basic metadata
@@ -604,7 +605,7 @@ class PrimeVideo(Singleton):
                 node[nodeName] = {'lazyLoadURL': targetURL}
                 if title:
                     node[nodeName]['title'] = title
-                refreshes.append((node[nodeName], nodeName, ancestorNode, ancestorName, True))
+                refreshes.append((node[nodeName], nodeName, True))
 
         from contextlib import contextmanager
 
@@ -618,7 +619,7 @@ class PrimeVideo(Singleton):
 
         with _busy_dialog():
             for r in refreshes:
-                self._LazyLoad(r[0], r[1], r[2], r[3], r[4])
+                self._LazyLoad(r[0], r[1], r[2])
 
     def Action(self, path, parm):
         """ Provides actions functionality """
@@ -908,6 +909,12 @@ class PrimeVideo(Singleton):
                             vd['metadata']['videometa']['tvshowtitle'] = self._videodata[vd['parent']]['metadata']['videometa']['parentTitle']
                             bUpdated = True
                         except: pass
+
+                # when the series is updated it is possible that the metadata
+                # will be lost because they are obtained from the series
+                # container at the beginning
+                if gti == state['pageTitleId'] and 'metadata' not in o:
+                    o['metadata'] = vd['metadata']
 
             # IMDB ratings — "imdb": {"amzn1.dv.gti.[…]": {"score": 8.5}}
             if ('imdb' in state) and state['imdb']:
